@@ -17,6 +17,9 @@ object Generator {
       var Name = Names.get(Cust_ID)
       var size  = Name.toString().length()
       var Cust_Name = Name.toString().substring(5,size-1)
+      var temp = Cust_Name.split(",")
+      var Cust_City = temp(1)
+      var Cust_Country = temp(2)
       println(Order_ID+","+Cust_ID+","+Cust_Name)
     }
   }
