@@ -5,8 +5,7 @@ import java.time.Instant
 object Generator {
   def main(args: Array[String]): Unit = {
 
-    var file = "C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\Names.txt"
-    val arr = Source.fromFile(file).getLines().toArray
+    val arr = readFileToArray("Names.txt")
     val Names = scala.collection.mutable.Map[Int, String]()
     for (n <- 1 to 100) {
       Names += (n -> arr(n - 1))
@@ -17,8 +16,8 @@ object Generator {
       var Order_ID = i
       var Cust_ID = r.nextInt(100)
       var Name = Names.get(Cust_ID)
-      var size = Name.toString().length()
-      var Cust_Name = Name.toString().substring(5, size - 1)
+      var size = Name.toString.length()
+      var Cust_Name = Name.toString.substring(5, size - 1)
       var temp = Cust_Name.split(",")
       var Cust_City = temp(1)
       var Cust_Country = temp(2)
@@ -60,7 +59,7 @@ object Generator {
 
   // https://alvinalexander.com/source-code/scala-function-read-text-file-into-array-list/
   def readFileToArray(filename: String): Array[String] = {
-    val bufferedSource = Source.fromFile(s"C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\$filename")
+    val bufferedSource = Source.fromFile(s"src\\main\\resources\\$filename")
     val lines = (for (line <- bufferedSource.getLines()) yield line).toArray
     bufferedSource.close
     lines
