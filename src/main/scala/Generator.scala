@@ -1,7 +1,6 @@
 import scala.io.Source
 import scala.util.Random
 import java.time.Instant
-import java.time
 
 object Generator {
   def main(args: Array[String]): Unit = {
