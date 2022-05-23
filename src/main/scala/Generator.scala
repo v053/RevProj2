@@ -2,6 +2,8 @@ import scala.io.Source
 import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
 import java.time.Instant
+import java.io.PrintWriter
+
 
 object Generator {
   val entries_to_generate = 10
@@ -22,10 +24,15 @@ object Generator {
   var all_txn_successes: ArrayBuffer[Any] = ArrayBuffer()
   var all_failure_reasons: ArrayBuffer[Any] = ArrayBuffer()
 
+//---------------------------------------------------------//
   def main(args: Array[String]): Unit = {
     Order()
     check_arrays()
+
+    //erroneous( );   //adds some errors 10~15% 
+    write_csv();   //prints data to .csv
   }
+//end main-------------------------------------------------//
 
   def check_arrays(): Unit = { // Prints the generated entries to the console
     val all_arrays = Array(
@@ -46,7 +53,7 @@ object Generator {
       all_failure_reasons
     )
 
-    for(i <- 0 until entries_to_generate) {
+    for(i <- 1 until entries_to_generate) {
       for(array <- all_arrays) {
         if (array.nonEmpty) print(array(i) + ", ")
       }
@@ -61,7 +68,7 @@ object Generator {
       Names += (n-> arr(n-1))
     }
 
-    for(i <- 1 to entries_to_generate) {
+    for(i <- 0 to entries_to_generate) {
       val Order_ID = i
       val Cust_ID = Random.nextInt(100)
       val Name = Names.get(Cust_ID)
@@ -120,7 +127,7 @@ object Generator {
 
   // https://alvinalexander.com/source-code/scala-function-read-text-file-into-array-list/
   def readFileToArray(filename: String): Array[String] = {
-    val bufferedSource = Source.fromFile(s"src\\main\\resources\\$filename")
+    val bufferedSource = Source.fromFile(s"../resources/$filename")
     val lines = (for (line <- bufferedSource.getLines()) yield line).toArray
     bufferedSource.close
     lines
@@ -134,6 +141,31 @@ object Generator {
     val random = Random.nextLong((current-start)+1)
     val time = Instant.ofEpochMilli(start+random)
     time
+  }
+
+  def write_csv( ) = {
+    
+    val pw = new PrintWriter("../resources/data.csv");
+
+    for(i <- 0 to entries_to_generate) {
+      pw.println(s"${all_customer_IDs(i)},");      //customer ID
+      pw.print(s"${all_customer_names(i)},");      //customer names
+      //pw.print(s"${all_product_IDs(i)},");           //product ID
+      //pw.print(s"${all_product_names(i)},");      //product names 
+      //pw.print(s"${all_product_category(i)},");     //product category
+      pw.print(s"${all_payment_types(i)},");     //payment type 
+      //pw.print(s"${all_qtys(i)},");     //qtys
+      //pw.print(s"${all_prices(i)},");     //prices
+      pw.print(s"${all_datetimes(i)},");     //date times
+      pw.print(s"${all_countries(i)},");     //country
+      pw.print(s"${all_cities(i)},");     //cities
+      pw.print(s"${all_website_names(i)},");     //website names
+      pw.print(s"${all_txn_ids(i)},");     //txn IDs
+      pw.print(s"${all_txn_successes(i)},");     //txn success
+      pw.print(s"${all_failure_reasons(i)},");     //failure reasons 
+    }
+
+    pw.close;   //always close to prevent seg fault 
   }
 }
 
