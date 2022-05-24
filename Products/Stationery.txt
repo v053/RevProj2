@@ -1,3 +1,5 @@
+//School supplies:
+
 Stapler
 Eraser
 Push-pin
@@ -18,3 +20,30 @@ Glue
 Scissors
 Sticky notes
 Paper
+
+//Tech supplies:
+
+Laptop
+Keyboard
+Mouse
+Charger
+Printer 
+Monitor
+Speaker
+Computer case
+Phone case 
+Lamp 
+
+
+//Home Supplies:
+
+Window cleaner
+Mop
+Boxcutter
+Ladder
+Screws
+Measuring cup
+Cutting board
+Dinner plates
+Ice cube trays
+Mixing bowl
