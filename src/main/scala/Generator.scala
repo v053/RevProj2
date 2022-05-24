@@ -6,7 +6,7 @@ import java.io.PrintWriter
 
 
 object Generator {
-  val entries_to_generate = 11  //10,000 final
+  val entries_to_generate = 10000  //10,000 final
   val amt_of_cells = entries_to_generate * 15
   val percent_erroneous = .15   //15% 
   val amt_of_errors = (amt_of_cells * percent_erroneous).asInstanceOf[Int]
@@ -74,31 +74,31 @@ object Generator {
     for(i <- 0 to (entries_to_generate - 1)) {
       val Order_ID = i
       val Cust_ID = Random.nextInt(100)
-      val Name = Names.get(Cust_ID)
-      val size = Name.toString.length()
-      val string = Name.toString.substring(5, size - 1)
-      val temp = string.split(",")
-      val Cust_Name = temp(0)
-      val Cust_City = temp(1)
-      val Cust_Country = temp(2)
-      val datetime = randomDate()
-      val payment_info = generatePaymentInfo(Order_ID)
-
-      all_customer_IDs += Cust_ID
-      all_customer_names += Cust_Name
-      // all_product_IDs += product_id
-      // all_product_names += product_name
-      all_payment_types += payment_info(1)
-      // all_qtys
-      // all_prices
-      all_datetimes += datetime
-      all_countries += Cust_Country
-      all_cities += Cust_City
-      all_website_names += payment_info(4)
-      all_txn_ids += payment_info.head
-      all_txn_successes += payment_info(2)
-      all_failure_reasons += payment_info(3)
-
+      if(Cust_ID !=0) {
+        val Name = Names.get(Cust_ID)
+        val size = Name.toString.length()
+        val string = Name.toString.substring(5, size - 1)
+        val temp = string.split(",")
+        val Cust_Name = temp(0)
+        val Cust_City = temp(1)
+        val Cust_Country = temp(2)
+        val datetime = randomDate()
+        val payment_info = generatePaymentInfo(Order_ID)
+        all_customer_IDs += Cust_ID
+        all_customer_names += Cust_Name
+        // all_product_IDs += product_id
+        // all_product_names += product_name
+        all_payment_types += payment_info(1)
+        // all_qtys
+        // all_prices
+        all_datetimes += datetime
+        all_countries += Cust_Country
+        all_cities += Cust_City
+        all_website_names += payment_info(4)
+        all_txn_ids += payment_info.head
+        all_txn_successes += payment_info(2)
+        all_failure_reasons += payment_info(3)
+      }
       }
     }
 
