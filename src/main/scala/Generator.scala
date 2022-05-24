@@ -71,7 +71,7 @@ object Generator {
 
     for(i <- 0 to entries_to_generate) {
       val Order_ID = i
-      val Cust_ID = (Random.nextInt(99)+1)
+      val Cust_ID = Random.nextInt(99)+1
       if(Cust_ID != 0) {
         val Name = Names.get(Cust_ID)
         val size = Name.toString.length()
@@ -149,7 +149,7 @@ object Generator {
     time
   }
 
-  def write_csv( ) = {
+  def write_csv( ): Unit = {
     
     val pw = new PrintWriter("data.csv")
 
@@ -172,7 +172,7 @@ object Generator {
       pw.println(s"${all_failure_reasons(i)},");     //failure reasons
     }
 
-    pw.close;   //always close to prevent seg fault 
+    pw.close();   //always close to prevent seg fault
   }
 }
 
