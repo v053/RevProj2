@@ -15,10 +15,10 @@ object Generator {
   var all_customer_names: ArrayBuffer[String] = ArrayBuffer()
   var all_product_IDs: ArrayBuffer[Int] = ArrayBuffer()
   var all_product_names: ArrayBuffer[String] = ArrayBuffer()
-  var all_product_category: ArrayBuffer[Int] = ArrayBuffer()
+  var all_product_category: ArrayBuffer[String] = ArrayBuffer()
   var all_payment_types: ArrayBuffer[Any] = ArrayBuffer()
   var all_qtys: ArrayBuffer[Int] = ArrayBuffer()
-  var all_prices: ArrayBuffer[Int] = ArrayBuffer()
+  var all_prices: ArrayBuffer[Double] = ArrayBuffer()
   var all_datetimes: ArrayBuffer[Instant] = ArrayBuffer()
   var all_countries: ArrayBuffer[String] = ArrayBuffer()
   var all_cities: ArrayBuffer[String] = ArrayBuffer()
@@ -64,14 +64,74 @@ object Generator {
     }
   }
 
+
+
   def Order(): Unit = {
-    val arr = readFileToArray("Names.txt")
-    val Names = scala.collection.mutable.Map[Int, String]()
-    for (n <- 1 to 100) {
-      Names += (n -> arr(n - 1))
-    }
 
     for (i <- 0 to entries_to_generate) {
+      //Product stuff
+      var product_id = 0
+      var product_name = ""
+      var product_price = 0.00
+      var quantity = 0
+      var product_cat = ""
+      //product category, product id, price
+      val Home_supplies = Seq((101,"Window cleaner",6.00), (102,"Mop",12.00),(103,"Box cutter",1.97),
+        (104,"Ladder",59.98), (106, "Screws",4.84), (107, "Measuring cup",1.88), (108, "Cutting board", 17.99)
+        , (109,"Dinner plates", 0.88), (110, "Ice cube trays", 2.44), (111, "Mixing bowl", 6.45))
+
+      val Tech_supplies = Seq((201,"Laptop",599.99), (202,"Keyboard",19.89), (203, "Mouse", 5.99),
+        (204,"Charger",10.99), (205, "Printer",74.00), (206, "Monitor",249.00), (207,"Speaker",25.99),
+        (208, "Computer case",58.27), (209, "Phone case", 5.98))
+
+      val School_supplies = Seq((301,"Stapler", 8.97), (302,"Eraser",3.45), (303,"Push-pin",1.14),
+        (304, "Thumbtack",10.99), (305,"Paper clip",0.94), (306,"Rubber stamp", 8.99), (307, "Highlighter",0.97),
+        (308,"Fountain pen",14.99), (309,"Pencil", 9.98), (310,"Marker", 9.89), (311,"Ballpoint",5.47),
+        (312,"Bulldog clip",0.99), (313,"Tape dispenser",4.47), (314,"Pencil sharpener",15.69), (315,"Label",2.12),
+        (316,"Calculator",5.62), (317,"Glue",3.79), (318, "Scissors", 8.54), (319,"Sticky notes",11.98), (320,"Paper", 9.72))
+
+
+      //randomization
+      var ram = util.Random
+
+      val ram_category = ram.nextInt(2)
+      if(ram_category == 0){
+        product_cat = "Home Supplies"
+        val Home_supplies1 = ram.nextInt(10)
+        //.toString().split(",")
+        val temp = Home_supplies(Home_supplies1)
+        product_id = temp._1
+        product_name = temp._2
+        product_price = temp._3
+        println(temp)
+      }else if ( ram_category == 1){
+        product_cat = "Tech Supplies"
+        val tech_supplies1 = ram.nextInt(8)
+        val temp = Tech_supplies(tech_supplies1)
+        product_id = temp._1
+        product_name = temp._2
+        product_price = temp._3
+        println(temp)
+      }else {
+        product_cat = "School Supplies"
+        val School_supplies1 = ram.nextInt(19)
+        val temp = School_supplies(School_supplies1)
+        product_id = temp._1
+        product_name = temp._2
+        product_price = temp._3
+        println(temp)
+      }
+      quantity = (ram.nextInt(90) + 1)
+      println(product_price)
+
+
+      val arr = readFileToArray("Names.txt")
+      val Names = scala.collection.mutable.Map[Int, String]()
+      for (n <- 1 to 100) {
+        Names += (n -> arr(n - 1))
+      }
+
+
       val Order_ID = i
       val Cust_ID = Random.nextInt(99) + 1
       //if(Cust_ID !=0) {
@@ -86,11 +146,12 @@ object Generator {
       val payment_info = generatePaymentInfo(Order_ID)
       all_customer_IDs += Cust_ID
       all_customer_names += Cust_Name
-      // all_product_IDs += product_id
-      // all_product_names += product_name
+      all_product_category += product_cat
+      all_product_IDs += product_id
+      all_product_names += product_name
       all_payment_types += payment_info(1)
-      // all_qtys
-      // all_prices
+      all_qtys += quantity
+      all_prices += product_price
       all_datetimes += datetime
       all_countries += Cust_Country
       all_cities += Cust_City
@@ -130,7 +191,8 @@ object Generator {
 
   // https://alvinalexander.com/source-code/scala-function-read-text-file-into-array-list/
   def readFileToArray(filename: String): Array[String] = {
-    val lines = Source.fromFile(s"C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\$filename").getLines.toArray
+    val f = new File(getClass.getClassLoader.getResource(filename).getPath)
+    val lines = Source.fromFile(f).getLines.toArray
     lines
   }
 
@@ -158,7 +220,6 @@ object Generator {
 
       rn = lo + r.nextInt((hi - lo) + 1); //picks a random row
       rn2 = lo + r.nextInt((15 - lo) + 1); //pick column
-      //println(rn)
       if (rn2 == 0) {
         all_customer_IDs(rn) = -1;
 
@@ -166,10 +227,10 @@ object Generator {
         all_customer_names(rn) = null;
 
       } else if (rn2 == 2) {
-        //all_product_IDs(rn) = -1;
+        all_product_IDs(rn) = -1;
 
       } else if (rn2 == 3) {
-        //all_product_names(rn) = null;
+        all_product_names(rn) = null;
 
       } else if (rn2 == 4) {
         //all_product_category(rn) = null;
@@ -208,20 +269,26 @@ object Generator {
 
   }
 
-  def write_csv(): Unit = {
+  def write_csv() = {
+    val f = new File(getClass.getClassLoader.getResource("data.csv").getPath)
+    val pw = new PrintWriter("data.csv")
 
-      val pw = new PrintWriter("data.csv")
+    //def write_csv(): Unit = {
+
+      //val pw = new PrintWriter("data.csv")
 
       for (i <- 1 until all_customer_IDs.length) {
-        pw.print(s"$i,")
+        pw.print(i+",")
         pw.print(s"${all_customer_IDs(i)},"); //customer ID
         pw.print(s"${all_customer_names(i)},"); //customer names
-        //pw.print(s"${all_product_IDs(i)},");           //product ID
-        //pw.print(s"${all_product_names(i)},");      //product names
-        //pw.print(s"${all_product_category(i)},");     //product category
+        pw.print(s"${all_product_IDs(i)},");           //product ID
+        pw.print(s"${all_product_names(i)},");      //product names
+        pw.print(s"${all_product_category(i)},");     //product category
         pw.print(s"${all_payment_types(i)},") //payment type
-        //pw.print(s"${all_qtys(i)},");     //qtys
-        //pw.print(s"${all_prices(i)},");     //prices
+        pw.print(s"${all_qtys(i)},");     //qtys
+        println(all_qtys(i))
+        pw.print(s"${all_prices(i)},");     //prices
+        println(all_prices(i))
         pw.print(s"${all_datetimes(i)},"); //date times
         pw.print(s"${all_countries(i)},"); //country
         pw.print(s"${all_cities(i)},"); //cities
@@ -232,6 +299,7 @@ object Generator {
       }
 
       pw.close; //always close to prevent seg fault
-    }
+   // }
+  }
 }
 
