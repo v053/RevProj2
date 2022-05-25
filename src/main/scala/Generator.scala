@@ -149,7 +149,7 @@ object Generator {
   def error_writer( ) = {
     //println(amt_of_errors);
     val lo = 0;                               //start -0
-    val hi = entries_to_generate - 1;             //total num of entries (rows)
+    val hi = all_customer_IDs.length - 1;             //total num of entries (rows)
     
     val r = new scala.util.Random;            //creates random number instance 
     var rn = lo + r.nextInt((hi - lo) + 1) - 1;   //init random num
