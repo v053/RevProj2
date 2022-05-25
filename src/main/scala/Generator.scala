@@ -1,14 +1,15 @@
+=======
 import scala.io.Source
 import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
 import java.time.Instant
-import java.io.PrintWriter
+import java.io.{File, PrintWriter}
 
 
 object Generator {
   val entries_to_generate = 10000  //10,000 final
   val amt_of_cells = entries_to_generate * 15
-  val percent_erroneous = .15   //15% 
+  val percent_erroneous = .15   //15%
   val amt_of_errors = (amt_of_cells * percent_erroneous).asInstanceOf[Int]
 
   var all_customer_IDs: ArrayBuffer[Int] = ArrayBuffer()
@@ -27,15 +28,15 @@ object Generator {
   var all_txn_successes: ArrayBuffer[Any] = ArrayBuffer()
   var all_failure_reasons: ArrayBuffer[Any] = ArrayBuffer()
 
-//---------------------------------------------------------//
+  //---------------------------------------------------------//
   def main(args: Array[String]): Unit = {
     Order()
     //check_arrays()
 
-    error_writer();   //adds some errors 10~15% 
+    error_writer();   //adds some errors 10~15%
     write_csv();      //prints data to .csv
   }
-//end main-------------------------------------------------//
+  //end main-------------------------------------------------//
 
   def check_arrays(): Unit = { // Prints the generated entries to the console
     val all_arrays = Array(
@@ -73,8 +74,8 @@ object Generator {
 
     for(i <- 0 to (entries_to_generate - 1)) {
       val Order_ID = i
-      val Cust_ID = Random.nextInt(100)
-      if(Cust_ID !=0) {
+      val Cust_ID = Random.nextInt(99)+1
+      //if(Cust_ID !=0) {
         val Name = Names.get(Cust_ID)
         val size = Name.toString.length()
         val string = Name.toString.substring(5, size - 1)
@@ -98,9 +99,9 @@ object Generator {
         all_txn_ids += payment_info.head
         all_txn_successes += payment_info(2)
         all_failure_reasons += payment_info(3)
-      }
-      }
+      //}
     }
+  }
 
   def selectRandomElement(array: Array[_]): Any = {
     val length = array.length
@@ -130,9 +131,8 @@ object Generator {
 
   // https://alvinalexander.com/source-code/scala-function-read-text-file-into-array-list/
   def readFileToArray(filename: String): Array[String] = {
-    val bufferedSource = Source.fromFile(s"../resources/$filename")
-    val lines = (for (line <- bufferedSource.getLines()) yield line).toArray
-    bufferedSource.close
+    val f = new File(getClass.getClassLoader.getResource(filename).getPath)
+    val lines = Source.fromFile(f).getLines.toArray
     lines
   }
 
@@ -141,7 +141,8 @@ object Generator {
   def randomDate(): Instant = {
     val start: Long = 946684800000L
     val current = Instant.now().toEpochMilli
-    val random = Random.nextLong((current-start)+1)
+    //(current-start)+1
+    val random = Random.nextLong()
     val time = Instant.ofEpochMilli(start+random)
     time
   }
@@ -149,17 +150,17 @@ object Generator {
   def error_writer( ) = {
     //println(amt_of_errors);
     val lo = 0;                               //start -0
-    val hi = all_customer_IDs.length - 1;             //total num of entries (rows)
-    
-    val r = new scala.util.Random;            //creates random number instance 
+    val hi = all_customer_names.length - 1;   //total num of entries (rows)
+
+    val r = new scala.util.Random;            //creates random number instance
     var rn = lo + r.nextInt((hi - lo) + 1) - 1;   //init random num
-    var rn2 = lo + r.nextInt((15 - lo) + 1) - 1;  //which field in that row 
+    var rn2 = lo + r.nextInt((15 - lo) + 1) - 1;  //which field in that row
 
-    for(i <- 0 to (amt_of_errors - 1)) {            //for the amount of errors we wanna gen 
-      
+    for(i <- 0 to (amt_of_errors - 1)) {            //for the amount of errors we wanna gen
+
       rn = lo + r.nextInt((hi - lo) + 1);     //picks a random row
-      rn2 = lo + r.nextInt((15 - lo) + 1);    //pick column 
-
+      rn2 = lo + r.nextInt((15 - lo) + 1);    //pick column
+      println(rn)
       if(rn2 == 0){
         all_customer_IDs(rn) = -1;
 
@@ -172,36 +173,36 @@ object Generator {
       }else if(rn2 == 3){
         //all_product_names(rn) = null;
 
-      }else if(rn2 == 4){ 
+      }else if(rn2 == 4){
         //all_product_category(rn) = null;
-      
+
       }else if(rn2 == 5){
-        all_payment_types(rn) = null; 
-      
+        all_payment_types(rn) = null;
+
       }else if(rn2 == 6){
         //all_qtys(rn) = null;
-      
+
       }else if(rn2 == 7){
         //all_prices(rn) = null;
-      
+
       }else if(rn2 == 8){
         all_datetimes(rn) = null;
 
-      }else if(rn2 == 9){ 
+      }else if(rn2 == 9){
         all_countries(rn) = null;
-      
+
       }else if(rn2 == 10){
         all_cities(rn) = null;
-      
-      }else if(rn2 == 11){ 
+
+      }else if(rn2 == 11){
         all_website_names(rn) = null;
-      
-      }else if(rn2 == 12 ){ 
+
+      }else if(rn2 == 12 ){
         all_txn_ids(rn) = null;
-      
-      }else if(rn2 == 13){ 
+
+      }else if(rn2 == 13){
         all_txn_successes(rn) = null;
-      
+
       }else if(rn2 == 14){
         all_failure_reasons(rn) = null;
       }
@@ -210,16 +211,17 @@ object Generator {
   }
 
   def write_csv( ) = {
-    
-    val pw = new PrintWriter("../resources/data.csv");
+    val f = new File(getClass.getClassLoader.getResource("data.csv").getPath)
+    val pw = new PrintWriter("data.csv")
 
-    for(i <- 0 to (entries_to_generate - 1)) {
-      pw.print(s"${all_customer_IDs(i)},");      //customer ID
-      pw.print(s"${all_customer_names(i)},");      //customer names
+    for(i <- 1 until all_customer_names.length) {
+      pw.print(i+",")
+      pw.print(all_customer_IDs(i)+",")     //customer ID
+      pw.print(s"${all_customer_names(i)},")      //customer names
       //pw.print(s"${all_product_IDs(i)},");           //product ID
-      //pw.print(s"${all_product_names(i)},");      //product names 
+      //pw.print(s"${all_product_names(i)},");      //product names
       //pw.print(s"${all_product_category(i)},");     //product category
-      pw.print(s"${all_payment_types(i)},");     //payment type 
+      pw.print(s"${all_payment_types(i)},")     //payment type
       //pw.print(s"${all_qtys(i)},");     //qtys
       //pw.print(s"${all_prices(i)},");     //prices
       pw.print(s"${all_datetimes(i)},");     //date times
@@ -228,10 +230,10 @@ object Generator {
       pw.print(s"${all_website_names(i)},");     //website names
       pw.print(s"${all_txn_ids(i)},");     //txn IDs
       pw.print(s"${all_txn_successes(i)},");     //txn success
-      pw.println(s"${all_failure_reasons(i)},");     //failure reasons 
+      pw.println(s"${all_failure_reasons(i)}"); //failure reasons
     }
 
-    pw.close;   //always close to prevent seg fault 
+    pw.close;   //always close to prevent seg fault
   }
 }
-
+>>>>>>> 5de485fe74ea1295377079aad4d3b42d812c401e
