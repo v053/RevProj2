@@ -130,8 +130,7 @@ object Generator {
 
   // https://alvinalexander.com/source-code/scala-function-read-text-file-into-array-list/
   def readFileToArray(filename: String): Array[String] = {
-    val f = new File(getClass.getClassLoader.getResource(filename).getPath)
-    val lines = Source.fromFile(f).getLines.toArray
+    val lines = Source.fromFile(s"C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\$filename").getLines.toArray
     lines
   }
 
@@ -159,7 +158,7 @@ object Generator {
 
       rn = lo + r.nextInt((hi - lo) + 1); //picks a random row
       rn2 = lo + r.nextInt((15 - lo) + 1); //pick column
-      println(rn)
+      //println(rn)
       if (rn2 == 0) {
         all_customer_IDs(rn) = -1;
 
@@ -209,11 +208,7 @@ object Generator {
 
   }
 
-  def write_csv() = {
-    val f = new File(getClass.getClassLoader.getResource("data.csv").getPath)
-    val pw = new PrintWriter("data.csv")
-
-    def write_csv(): Unit = {
+  def write_csv(): Unit = {
 
       val pw = new PrintWriter("data.csv")
 
@@ -238,6 +233,5 @@ object Generator {
 
       pw.close; //always close to prevent seg fault
     }
-  }
 }
 
