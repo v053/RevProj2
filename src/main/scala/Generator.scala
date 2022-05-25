@@ -1,4 +1,3 @@
-=======
 import scala.io.Source
 import scala.util.Random
 import scala.collection.mutable.ArrayBuffer
@@ -236,4 +235,3 @@ object Generator {
     pw.close;   //always close to prevent seg fault
   }
 }
->>>>>>> 5de485fe74ea1295377079aad4d3b42d812c401e
