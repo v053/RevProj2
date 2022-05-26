@@ -94,7 +94,7 @@ object Generator {
       //randomization
       val ram = util.Random
 
-      val ram_category = ram.nextInt(2)
+      val ram_category = ram.nextInt(3)
       if(ram_category == 0){
         product_cat = "Home Supplies"
         val Home_supplies1 = ram.nextInt(10)
@@ -191,8 +191,8 @@ object Generator {
 
   // https://alvinalexander.com/source-code/scala-function-read-text-file-into-array-list/
   def readFileToArray(filename: String): Array[String] = {
-    val f = new File(getClass.getClassLoader.getResource(filename).getPath)
-    //val f = s"C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\$filename"
+    //val f = new File(getClass.getClassLoader.getResource(filename).getPath)
+    val f = s"C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\$filename"
     val file = Source.fromFile(f)
     val lines = file.getLines.toArray
     file.close()
@@ -245,10 +245,10 @@ object Generator {
         all_payment_types(rn) = null
 
       } else if (rn2 == 6) {
-        all_qtys(rn) = null
+        //all_qtys(rn) = null
 
       } else if (rn2 == 7) {
-        all_prices(rn) = null
+        //all_prices(rn) = null
 
       } else if (rn2 == 8) {
         all_datetimes(rn) = null
@@ -301,7 +301,7 @@ object Generator {
         pw.print(s"${all_website_names(i)},") //website names
         pw.print(s"${all_txn_ids(i)},") //txn IDs
         pw.print(s"${all_txn_successes(i)},") //txn success
-        pw.println(s"${all_failure_reasons(i)},") //failure reasons
+        pw.println(s"${all_failure_reasons(i)}") //failure reasons
       }
 
       pw.close() //always close to prevent seg fault

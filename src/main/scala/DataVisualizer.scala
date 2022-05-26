@@ -25,10 +25,32 @@ object DataVisualizer {
   val sample_df3: DataFrame = spark.createDataFrame(sample_data3).toDF("Time", "Access")
   val sample_df4: DataFrame = spark.createDataFrame(sample_data4).toDF("Time", "Access")
 
+  //val df = spark.read.csv("C:\\Users\\ethan\\Downloads\\Comdata.csv")
+  val df: DataFrame = spark.read.format("csv")
+    .option("header","false")
+    .load("C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\data.csv")
+    .toDF("order_id","customer_id","customer_name",
+      "product_id","product_name", "product_category","payment_type","qty","product_price",
+      "datetime","country","city",
+      "website","txn_id","txn_success","failure_reason")
+
+  df.createOrReplaceTempView("orders")
+
+  /*df.createOrReplaceTempView("Orders")
+  df.registerTempTable("Orders")
+  val sqlDF = spark.sql ("SELECT * FROM Orders where _c6 = 'Wallet'")
+  sqlDF.show()*/
+
   def main(args: Array[String]): Unit = {
     //plotBarChart(sample_df1)
     //plotLineChart(sample_df2)
-    plotMultiLineChart(Array(sample_df2, sample_df3, sample_df4))
+    //plotMultiLineChart(Array(sample_df2, sample_df3, sample_df4))
+    queryTopSellingProduct()
+  }
+
+  def queryTopSellingProduct(): Unit = {
+    val query_selection_df: DataFrame = spark.sql("SELECT product_category, COUNT(order_id) AS products_ordered FROM orders WHERE product_category != 'null' GROUP BY product_category")
+    query_selection_df.show
   }
 
   def plotBarChart(df: DataFrame, chart_title: String = ""): Unit = {
@@ -40,6 +62,7 @@ object DataVisualizer {
       my_data_type match {
         case StringType => data_type_array += Nom
         case IntegerType => data_type_array += Quant
+        case DoubleType => data_type_array += Quant
         case _ => println("Not a recognized type")
       }
     }
@@ -62,6 +85,7 @@ object DataVisualizer {
       my_data_type match {
         case StringType => data_type_array += Nom
         case IntegerType => data_type_array += Quant
+        case DoubleType => data_type_array += Quant
         case _ => println("Not a recognized type")
       }
     }
@@ -102,6 +126,7 @@ object DataVisualizer {
       my_data_type match {
         case StringType => data_type_array += Nom
         case IntegerType => data_type_array += Quant
+        case DoubleType => data_type_array += Quant
         case _ => println("Not a recognized type")
       }
     }
