@@ -7,9 +7,9 @@ import java.io.{File, PrintWriter}
 
 object Generator {
   val entries_to_generate = 10000 //10,000 final
-  val amt_of_cells = entries_to_generate * 15
+  val amt_of_cells: Int = entries_to_generate * 15
   val percent_erroneous = .15 //15%
-  val amt_of_errors = (amt_of_cells * percent_erroneous).asInstanceOf[Int]
+  val amt_of_errors: Int = (amt_of_cells * percent_erroneous).asInstanceOf[Int]
 
   var all_customer_IDs: ArrayBuffer[Int] = ArrayBuffer()
   var all_customer_names: ArrayBuffer[String] = ArrayBuffer()
@@ -92,7 +92,7 @@ object Generator {
 
 
       //randomization
-      var ram = util.Random
+      val ram = util.Random
 
       val ram_category = ram.nextInt(2)
       if(ram_category == 0){
@@ -103,7 +103,7 @@ object Generator {
         product_id = temp._1
         product_name = temp._2
         product_price = temp._3
-        println(temp)
+        //println(temp)
       }else if ( ram_category == 1){
         product_cat = "Tech Supplies"
         val tech_supplies1 = ram.nextInt(8)
@@ -111,7 +111,7 @@ object Generator {
         product_id = temp._1
         product_name = temp._2
         product_price = temp._3
-        println(temp)
+        //println(temp)
       }else {
         product_cat = "School Supplies"
         val School_supplies1 = ram.nextInt(19)
@@ -119,10 +119,10 @@ object Generator {
         product_id = temp._1
         product_name = temp._2
         product_price = temp._3
-        println(temp)
+        //println(temp)
       }
-      quantity = (ram.nextInt(90) + 1)
-      println(product_price)
+      quantity = ram.nextInt(90) + 1
+      //println(product_price)
 
 
       val arr = readFileToArray("Names.txt")
@@ -191,23 +191,29 @@ object Generator {
 
   // https://alvinalexander.com/source-code/scala-function-read-text-file-into-array-list/
   def readFileToArray(filename: String): Array[String] = {
-    val f = new File(getClass.getClassLoader.getResource(filename).getPath)
-    val lines = Source.fromFile(f).getLines.toArray
+    //val f = new File(getClass.getClassLoader.getResource(filename).getPath)
+    val f = s"C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\$filename"
+    val file = Source.fromFile(f)
+    val lines = file.getLines.toArray
+    file.close()
     lines
   }
 
   // https://stackoverflow.com/questions/35774504/random-date-between-2-given-dates
   // https://www.baeldung.com/java-random-dates
   def randomDate(): Instant = {
-    val start: Long = 946684800000L
-    val current = Instant.now().toEpochMilli
-    //(current-start)+1
-    val random = Random.nextLong()
-    val time = Instant.ofEpochMilli(start + random)
+    val start = Instant.parse("2010-01-01T00:00:00.001Z")
+    val start_long = start.getEpochSecond
+    val current = Instant.now
+    val current_long: Long = current.getEpochSecond
+    val max_int = (current_long-start_long).toInt
+    val random_int = Random.nextInt(max_int-1) + 1
+    val random_long = random_int.toLong
+    val time = start.plusSeconds(random_long)
     time
   }
 
-  def error_writer() = {
+  def error_writer(): Unit = {
     //println(amt_of_errors);
     val lo = 0; //start -0
     val hi = all_customer_names.length - 1; //total num of entries (rows)
@@ -216,60 +222,60 @@ object Generator {
     var rn = lo + r.nextInt((hi - lo) + 1) - 1; //init random num
     var rn2 = lo + r.nextInt((15 - lo) + 1) - 1; //which field in that row
 
-    for (i <- 0 to (amt_of_errors - 1)) { //for the amount of errors we wanna gen
+    for (i <- 0 until amt_of_errors) { //for the amount of errors we wanna gen
 
       rn = lo + r.nextInt((hi - lo) + 1); //picks a random row
       rn2 = lo + r.nextInt((15 - lo) + 1); //pick column
       if (rn2 == 0) {
-        all_customer_IDs(rn) = -1;
+        all_customer_IDs(rn) = -1
 
       } else if (rn2 == 1) {
-        all_customer_names(rn) = null;
+        all_customer_names(rn) = null
 
       } else if (rn2 == 2) {
-        all_product_IDs(rn) = -1;
+        all_product_IDs(rn) = -1
 
       } else if (rn2 == 3) {
-        all_product_names(rn) = null;
+        all_product_names(rn) = null
 
       } else if (rn2 == 4) {
-        //all_product_category(rn) = null;
+        all_product_category(rn) = null
 
       } else if (rn2 == 5) {
-        all_payment_types(rn) = null;
+        all_payment_types(rn) = null
 
       } else if (rn2 == 6) {
-        //all_qtys(rn) = null;
+        all_qtys(rn) = null
 
       } else if (rn2 == 7) {
-        //all_prices(rn) = null;
+        all_prices(rn) = null
 
       } else if (rn2 == 8) {
-        all_datetimes(rn) = null;
+        all_datetimes(rn) = null
 
       } else if (rn2 == 9) {
-        all_countries(rn) = null;
+        all_countries(rn) = null
 
       } else if (rn2 == 10) {
-        all_cities(rn) = null;
+        all_cities(rn) = null
 
       } else if (rn2 == 11) {
-        all_website_names(rn) = null;
+        all_website_names(rn) = null
 
       } else if (rn2 == 12) {
-        all_txn_ids(rn) = null;
+        all_txn_ids(rn) = null
 
       } else if (rn2 == 13) {
-        all_txn_successes(rn) = null;
+        all_txn_successes(rn) = null
 
       } else if (rn2 == 14) {
-        all_failure_reasons(rn) = null;
+        all_failure_reasons(rn) = null
       }
     }
 
   }
 
-  def write_csv() = {
+  def write_csv(): Unit = {
     val f = new File(getClass.getClassLoader.getResource("data.csv").getPath)
     val pw = new PrintWriter("data.csv")
 
@@ -279,26 +285,26 @@ object Generator {
 
       for (i <- 1 until all_customer_IDs.length) {
         pw.print(i+",")
-        pw.print(s"${all_customer_IDs(i)},"); //customer ID
-        pw.print(s"${all_customer_names(i)},"); //customer names
-        pw.print(s"${all_product_IDs(i)},");           //product ID
-        pw.print(s"${all_product_names(i)},");      //product names
-        pw.print(s"${all_product_category(i)},");     //product category
+        pw.print(s"${all_customer_IDs(i)},") //customer ID
+        pw.print(s"${all_customer_names(i)},") //customer names
+        pw.print(s"${all_product_IDs(i)},")           //product ID
+        pw.print(s"${all_product_names(i)},")      //product names
+        pw.print(s"${all_product_category(i)},")     //product category
         pw.print(s"${all_payment_types(i)},") //payment type
-        pw.print(s"${all_qtys(i)},");     //qtys
-        println(all_qtys(i))
-        pw.print(s"${all_prices(i)},");     //prices
-        println(all_prices(i))
-        pw.print(s"${all_datetimes(i)},"); //date times
-        pw.print(s"${all_countries(i)},"); //country
-        pw.print(s"${all_cities(i)},"); //cities
-        pw.print(s"${all_website_names(i)},"); //website names
-        pw.print(s"${all_txn_ids(i)},"); //txn IDs
-        pw.print(s"${all_txn_successes(i)},"); //txn success
-        pw.println(s"${all_failure_reasons(i)},"); //failure reasons
+        pw.print(s"${all_qtys(i)},")     //qtys
+        //println(all_qtys(i))
+        pw.print(s"${all_prices(i)},")     //prices
+        //println(all_prices(i))
+        pw.print(s"${all_datetimes(i)},") //date times
+        pw.print(s"${all_countries(i)},") //country
+        pw.print(s"${all_cities(i)},") //cities
+        pw.print(s"${all_website_names(i)},") //website names
+        pw.print(s"${all_txn_ids(i)},") //txn IDs
+        pw.print(s"${all_txn_successes(i)},") //txn success
+        pw.println(s"${all_failure_reasons(i)},") //failure reasons
       }
 
-      pw.close; //always close to prevent seg fault
+      pw.close() //always close to prevent seg fault
    // }
   }
 }
