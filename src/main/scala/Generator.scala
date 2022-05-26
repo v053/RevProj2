@@ -191,8 +191,8 @@ object Generator {
 
   // https://alvinalexander.com/source-code/scala-function-read-text-file-into-array-list/
   def readFileToArray(filename: String): Array[String] = {
-    //val f = new File(getClass.getClassLoader.getResource(filename).getPath)
-    val f = s"C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\$filename"
+    val f = new File(getClass.getClassLoader.getResource(filename).getPath)
+    //val f = s"C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\$filename"
     val file = Source.fromFile(f)
     val lines = file.getLines.toArray
     file.close()
