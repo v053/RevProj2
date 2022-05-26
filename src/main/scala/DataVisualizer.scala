@@ -1,3 +1,5 @@
+
+import Generator.getClass
 import vegas._
 import vegas.sparkExt._
 import vegas.DSL.UnitSpecBuilder
@@ -5,6 +7,7 @@ import vegas.DSL.UnitSpecBuilder
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 
+import java.io.File
 import scala.collection.mutable.ArrayBuffer
 
 
@@ -16,6 +19,17 @@ object DataVisualizer {
     .enableHiveSupport()
     .getOrCreate()
 
+  /*val df = spark.read.csv("data.csv")
+  df.createOrReplaceTempView("Orders")
+  df.registerTempTable("Orders")
+  val dfQ2_1 = spark.sql ("SELECT _c9,_c4, sum(_c7) FROM Orders where _c9 like '2021%' AND _c4 = 'Cutting board'  group by _c9").toDF("Product","Time","Products Sold")
+  dfQ2_1.show()
+  val dfQ1_1 = spark.sql("SELECT _c5, sum(_c7) FROM Orders group by _c5").toDF("Category","Products Sold")
+  //dfQ1_1.show()
+  val dfQ1_2 = spark.sql("SELECT _c11, _c5, sum(_c7) FROM Orders group by _c11, _c5").toDF("Country","Category","Products Sold")
+  //dfQ1_2.show()*/
+
+  // Sample Data
   val sample_data1: Seq[(String, Int)] = Seq(("stationery", 10), ("household products", 3), ("groceries", 5))
   val sample_data2: Seq[(String, Int)] = Seq(("00:00",50), ("01:00", 120), ("02:00",150), ("03:00",400))
   val sample_data3: Seq[(String, Int)] = Seq(("00:00",20), ("01:00", 100), ("02:00",350), ("03:00",470))
@@ -23,9 +37,9 @@ object DataVisualizer {
   val sample_df1: DataFrame = spark.createDataFrame(sample_data1).toDF("Category Name", "Products Sold")
   val sample_df2: DataFrame = spark.createDataFrame(sample_data2).toDF("Time", "Access")
   val sample_df3: DataFrame = spark.createDataFrame(sample_data3).toDF("Time", "Access")
-  val sample_df4: DataFrame = spark.createDataFrame(sample_data4).toDF("Time", "Access")
 
-  //val df = spark.read.csv("C:\\Users\\ethan\\Downloads\\Comdata.csv")
+
+  //val df = spark.read.csv("data.csv")
   val df: DataFrame = spark.read.format("csv")
     .option("header","false")
     .load("C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\data.csv")
