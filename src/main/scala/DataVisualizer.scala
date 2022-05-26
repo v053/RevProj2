@@ -45,15 +45,19 @@ object DataVisualizer {
     //plotBarChart(sample_df1)
     //plotLineChart(sample_df2)
     //plotMultiLineChart(Array(sample_df2, sample_df3, sample_df4))
-    queryTopSellingProduct()
+    queryTopSellingProductByCountry()
   }
-
   def queryTopSellingProduct(): Unit = {
-    val query_selection_df: DataFrame = spark.sql("SELECT product_category, COUNT(order_id) AS products_ordered FROM orders WHERE product_category != 'null' GROUP BY product_category")
-    query_selection_df.show
+    val query_selection_df: DataFrame = spark.sql("SELECT product_category, COUNT(order_id) AS quantity FROM orders WHERE product_category != 'null' AND country != 'null' GROUP BY product_category")
+    plotBarChart(query_selection_df)
   }
 
-  def plotBarChart(df: DataFrame, chart_title: String = ""): Unit = {
+  def queryTopSellingProductByCountry(): Unit = {
+    val query_selection_df: DataFrame = spark.sql("SELECT country, COUNT(order_id) AS quantity, product_category FROM orders WHERE product_category != 'null' AND country != 'null' GROUP BY country, product_category")
+    plotBarChart(query_selection_df, has_categories = true, category_filter = "product_category")
+  }
+
+  def getPlotInfo(df: DataFrame): ArrayBuffer[spec.Spec.Type] = {
     val col_name_array = df.columns
     val data_type_array: ArrayBuffer[spec.Spec.Type] = ArrayBuffer()
 
@@ -63,32 +67,43 @@ object DataVisualizer {
         case StringType => data_type_array += Nom
         case IntegerType => data_type_array += Quant
         case DoubleType => data_type_array += Quant
+        case LongType => data_type_array += Quant
+        case FloatType => data_type_array += Quant
         case _ => println("Not a recognized type")
       }
     }
 
-    val plot = Vegas(chart_title)
-      .withDataFrame(df)
-      .encodeX(col_name_array(0), data_type_array(0))
-      .encodeY(col_name_array(1), data_type_array(1))
-      .mark(Bar)
+    data_type_array
+  }
 
-    plot.show
+  def plotBarChart(df: DataFrame, has_categories: Boolean = false, category_filter: String = "", chart_title: String = ""): Unit = {
+    val col_name_array = df.columns
+    val data_type_array = getPlotInfo(df)
+
+    if (has_categories) {
+      val plot = Vegas(chart_title)
+        .withDataFrame(df)
+        .encodeX(col_name_array(0), data_type_array(0))
+        .encodeY(col_name_array(1), data_type_array(1))
+        .mark(Bar)
+        .encodeColor(field=category_filter, dataType=Nominal)
+
+      plot.show
+
+    } else {
+      val plot = Vegas(chart_title)
+        .withDataFrame(df)
+        .encodeX(col_name_array(0), data_type_array(0))
+        .encodeY(col_name_array(1), data_type_array(1))
+        .mark(Bar)
+
+      plot.show
+    }
   }
 
   def plotLineChart(df: DataFrame, chart_title: String = ""): Unit = {
     val col_name_array = df.columns
-    val data_type_array: ArrayBuffer[spec.Spec.Type] = ArrayBuffer()
-
-    for (column <- col_name_array) {
-      val my_data_type = df.schema(column).dataType
-      my_data_type match {
-        case StringType => data_type_array += Nom
-        case IntegerType => data_type_array += Quant
-        case DoubleType => data_type_array += Quant
-        case _ => println("Not a recognized type")
-      }
-    }
+    val data_type_array = getPlotInfo(df)
 
     val plot = Vegas(chart_title)
       .withDataFrame(df)
@@ -119,17 +134,7 @@ object DataVisualizer {
 
   def createGraphLayer(df: DataFrame): UnitSpecBuilder = {
     val col_name_array = df.columns
-    val data_type_array: ArrayBuffer[spec.Spec.Type] = ArrayBuffer()
-
-    for (column <- col_name_array) {
-      val my_data_type = df.schema(column).dataType
-      my_data_type match {
-        case StringType => data_type_array += Nom
-        case IntegerType => data_type_array += Quant
-        case DoubleType => data_type_array += Quant
-        case _ => println("Not a recognized type")
-      }
-    }
+    val data_type_array = getPlotInfo(df)
 
     val my_layer = Layer()
       .withDataFrame(df)
