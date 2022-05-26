@@ -61,6 +61,9 @@ object DataVisualizer {
     //plotMultiLineChart(Array(sample_df2, sample_df3, sample_df4))
     queryTopSellingProductByCountry()
   }
+
+
+  // Queries
   def queryTopSellingProduct(): Unit = {
     val query_selection_df: DataFrame = spark.sql("SELECT product_category, COUNT(order_id) AS quantity FROM orders WHERE product_category != 'null' AND country != 'null' GROUP BY product_category")
     plotBarChart(query_selection_df)
@@ -71,6 +74,8 @@ object DataVisualizer {
     plotBarChart(query_selection_df, has_categories = true, category_filter = "product_category")
   }
 
+
+  // Plotting
   def getPlotInfo(df: DataFrame): ArrayBuffer[spec.Spec.Type] = {
     val col_name_array = df.columns
     val data_type_array: ArrayBuffer[spec.Spec.Type] = ArrayBuffer()
