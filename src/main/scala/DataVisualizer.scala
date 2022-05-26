@@ -1,8 +1,9 @@
 import vegas._
 import vegas.sparkExt._
+import vegas.DSL.UnitSpecBuilder
+
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
-import vegas.DSL.UnitSpecBuilder
 
 import scala.collection.mutable.ArrayBuffer
 
