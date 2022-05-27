@@ -7,7 +7,6 @@ import vegas.DSL.UnitSpecBuilder
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 
-import java.io.File
 import scala.collection.mutable.ArrayBuffer
 
 
@@ -48,12 +47,9 @@ object DataVisualizer {
   df.createOrReplaceTempView("orders")
 
   def main(args: Array[String]): Unit = {
-    //queryYearPopularity("'Computer case'")
-    //queryTopSellingProductByCountry()
-    //queryTopSellingProduct()
-    //queryYearPopularity("'Computer case'")
+    queryTopSellingProduct()
+    queryTopSellingProductByCountry()
   }
-
 
   // Queries
   def queryTopSellingProduct(): Unit = {
@@ -63,18 +59,9 @@ object DataVisualizer {
 
   def queryTopSellingProductByCountry(): Unit = {
     val query_selection_df: DataFrame = spark.sql("SELECT country, SUM(qty) AS quantity, product_category FROM orders WHERE product_category != 'null' AND country != 'null' GROUP BY country, product_category")
-    plotBarChart(query_selection_df, has_categories = true, category_filter = "product_category", chart_title = "Top Selling Product Category By Country")
+    plotBarChart(query_selection_df,true,"product_category","Top Product Category by Country")
   }
 
-  def queryYearPopularity(product_name: String, year: String = "2021"): Unit = {
-    val dfQ2_1 = spark.sql (s"SELECT datetime, SUM(qty) FROM orders where product_name = $product_name AND qty != 'null'")
-    plotLineChart(dfQ2_1)
-    //dfQ2_1.show()
-    //val dfQ1_1 = spark.sql("SELECT _c5, sum(_c7) FROM Orders group by _c5").toDF("Category","Products Sold")
-    //dfQ1_1.show()
-    //val dfQ1_2 = spark.sql("SELECT _c11, _c5, sum(_c7) FROM Orders group by _c11, _c5").toDF("Country","Category","Products Sold")
-    //dfQ1_2.show()
-  }
 
   // Plotting
   def getPlotInfo(df: DataFrame): ArrayBuffer[spec.Spec.Type] = {
@@ -83,7 +70,7 @@ object DataVisualizer {
 
     for (column <- col_name_array) {
       val my_data_type = df.schema(column).dataType
-      println(column + ", " + my_data_type)
+      //println(column + ", " + my_data_type)
       my_data_type match {
         case StringType => data_type_array += Nom
         case IntegerType => data_type_array += Quant
@@ -104,10 +91,11 @@ object DataVisualizer {
     if (has_categories) {
       val plot = Vegas(chart_title)
         .withDataFrame(df)
-        .encodeX(col_name_array(0), data_type_array(0))
+        .encodeColumn(col_name_array(0), Nominal, scale=Scale(padding=4.0), axis=Axis(orient=Orient.Bottom, axisWidth=1.0, offset= -8.0))
         .encodeY(col_name_array(1), data_type_array(1))
+        .encodeX(category_filter, Nominal, hideAxis=true)
+        .encodeColor(category_filter, Nominal)
         .mark(Bar)
-        .encodeColor(field=category_filter, dataType=Nominal)
 
       plot.show
 
@@ -116,6 +104,7 @@ object DataVisualizer {
         .withDataFrame(df)
         .encodeX(col_name_array(0), data_type_array(0))
         .encodeY(col_name_array(1), data_type_array(1))
+        .encodeColor(col_name_array(0), data_type_array(0))
         .mark(Bar)
 
       plot.show
@@ -150,7 +139,7 @@ object DataVisualizer {
     val colors = Array("0653BE","BE06AF", "#BE7106", "06BE15", "36CCF0")
     val all_layers: ArrayBuffer[UnitSpecBuilder] = ArrayBuffer()
     for(df <- df_array) {
-      val layer = createGraphLayer(df)
+      val layer = createGraphLayer(df, Line)
       all_layers += layer.encodeColor(value = colors(df_array.indexOf(df)%colors.length))
     }
 
@@ -164,7 +153,7 @@ object DataVisualizer {
     plot.show
   }
 
-  def createGraphLayer(df: DataFrame): UnitSpecBuilder = {
+  def createGraphLayer(df: DataFrame, mark_type: spec.Spec.Mark): UnitSpecBuilder = {
     val col_name_array = df.columns
     val data_type_array = getPlotInfo(df)
 
@@ -172,7 +161,7 @@ object DataVisualizer {
       .withDataFrame(df)
       .encodeX(col_name_array(0), data_type_array(0))
       .encodeY(col_name_array(1), data_type_array(1))
-      .mark(Line)
+      .mark(mark_type)
 
     my_layer
   }
