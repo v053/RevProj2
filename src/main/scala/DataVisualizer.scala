@@ -1,11 +1,10 @@
 
-import Generator.getClass
 import vegas._
 import vegas.sparkExt._
-import vegas.DSL.UnitSpecBuilder
-
+import vegas.DSL.ExtendedUnitSpecBuilder
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
+import java.io.PrintWriter
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -17,6 +16,8 @@ object DataVisualizer {
     .config("spark.master", "local")
     .enableHiveSupport()
     .getOrCreate()
+
+  var all_plots: ArrayBuffer[ExtendedUnitSpecBuilder] = ArrayBuffer()
 
   /*val df = spark.read.csv("data.csv")
   df.createOrReplaceTempView("Orders")
@@ -47,8 +48,11 @@ object DataVisualizer {
   df.createOrReplaceTempView("orders")
 
   def main(args: Array[String]): Unit = {
-    //queryTopSellingProduct()
+    queryTopSellingProduct()
     queryTopSellingProductByCountry()
+
+
+    showAndWriteToHTML()
   }
 
   // Queries
@@ -59,7 +63,7 @@ object DataVisualizer {
 
   def queryTopSellingProductByCountry(): Unit = {
     val query_selection_df: DataFrame = spark.sql("SELECT country, SUM(qty) AS quantity, product_category FROM orders WHERE product_category != 'null' AND country != 'null' GROUP BY country, product_category")
-    plotBarChart(query_selection_df,true,"product_category","Top Product Category by Country")
+    plotBarChart(query_selection_df,has_categories = true,"product_category","Top Product Category by Country")
   }
 
 
@@ -97,7 +101,8 @@ object DataVisualizer {
         .encodeColor(category_filter, Nominal)
         .mark(Bar)
 
-      plot.show
+      //val raw_html = plot.html.plotHTML(chart_title)
+      all_plots += plot
 
     } else {
       val plot = Vegas(chart_title)
@@ -107,7 +112,8 @@ object DataVisualizer {
         .encodeColor(col_name_array(0), data_type_array(0))
         .mark(Bar)
 
-      plot.show
+      //val raw_html = plot.html.plotHTML(chart_title)
+      all_plots += plot
     }
   }
 
@@ -124,7 +130,8 @@ object DataVisualizer {
         .encodeDetailFields(Field(field=category_filter, dataType=Nominal))
         .encodeColor(category_filter, Nominal)
 
-      plot.show
+      //val raw_html = plot.html.plotHTML(chart_title)
+      all_plots += plot
     } else {
       val plot = Vegas(chart_title)
         .withDataFrame(df)
@@ -132,11 +139,12 @@ object DataVisualizer {
         .encodeY(col_name_array(1), data_type_array(1))
         .mark(Line)
 
-      plot.show
+      //val raw_html = plot.html.plotHTML(chart_title)
+      all_plots += plot
     }
   }
 
-  def plotMultiLineChart(df_array: Array[DataFrame], chart_title: String = ""): Unit = {
+  /*def plotMultiLineChart(df_array: Array[DataFrame], chart_title: String = ""): Unit = {
     val colors = Array("0653BE","BE06AF", "#BE7106", "06BE15", "36CCF0")
     val all_layers: ArrayBuffer[UnitSpecBuilder] = ArrayBuffer()
     for(df <- df_array) {
@@ -165,5 +173,21 @@ object DataVisualizer {
       .mark(mark_type)
 
     my_layer
+  }*/
+
+
+  def showAndWriteToHTML(): Unit = {
+    val pw = new PrintWriter("plots.html")
+    if(all_plots.nonEmpty) {
+      pw.println(all_plots(0).html.headerHTML())
+      for (i <- all_plots.indices) {
+        all_plots(i).show
+        pw.println(all_plots(i).html.plotHTML())
+      }
+      pw.println(all_plots(0).html.footerHTML)
+    } else {
+      pw.println("No charts to write.")
+    }
+    pw.close()
   }
 }
