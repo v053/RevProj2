@@ -47,7 +47,7 @@ object DataVisualizer {
   df.createOrReplaceTempView("orders")
 
   def main(args: Array[String]): Unit = {
-    queryTopSellingProduct()
+    //queryTopSellingProduct()
     queryTopSellingProductByCountry()
   }
 
@@ -121,6 +121,8 @@ object DataVisualizer {
         .encodeX(col_name_array(0), data_type_array(0))
         .encodeY(col_name_array(1), data_type_array(1))
         .mark(Line)
+        .encodeDetailFields(Field(field=category_filter, dataType=Nominal))
+        .encodeColor(category_filter, Nominal)
 
       plot.show
     } else {
@@ -129,7 +131,6 @@ object DataVisualizer {
         .encodeX(col_name_array(0), data_type_array(0))
         .encodeY(col_name_array(1), data_type_array(1))
         .mark(Line)
-        .encodeColor(field=category_filter, dataType=Nominal)
 
       plot.show
     }
