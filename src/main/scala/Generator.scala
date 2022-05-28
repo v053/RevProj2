@@ -7,9 +7,8 @@ import java.io.{File, PrintWriter}
 
 object Generator {
   val entries_to_generate = 10000 //10,000 final
-  val amt_of_cells: Int = entries_to_generate * 15
   val percent_erroneous = .15 //15%
-  val amt_of_errors: Int = (amt_of_cells * percent_erroneous).asInstanceOf[Int]
+  val amt_of_errors: Int = (entries_to_generate * percent_erroneous).asInstanceOf[Int]
 
   var all_customer_IDs: ArrayBuffer[Int] = ArrayBuffer()
   var all_customer_names: ArrayBuffer[String] = ArrayBuffer()
@@ -192,9 +191,10 @@ object Generator {
   // https://alvinalexander.com/source-code/scala-function-read-text-file-into-array-list/
   def readFileToArray(filename: String): Array[String] = {
     //val f = new File(getClass.getClassLoader.getResource(filename).getPath)
-    val f = s"C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\$filename"
+    //val f = s"C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\$filename"
+    val f = s"../resources/$filename"
     val file = Source.fromFile(f)
-    val lines = file.getLines.toArray
+    val lines = file.getLines().toArray
     file.close()
     lines
   }
@@ -245,10 +245,10 @@ object Generator {
         all_payment_types(rn) = null
 
       } else if (rn2 == 6) {
-        //all_qtys(rn) = null
+        all_qtys(rn) = null
 
       } else if (rn2 == 7) {
-        //all_prices(rn) = null
+        all_prices(rn) = null
 
       } else if (rn2 == 8) {
         all_datetimes(rn) = null
@@ -276,15 +276,11 @@ object Generator {
   }
 
   def write_csv(): Unit = {
-    val f = new File(getClass.getClassLoader.getResource("data.csv").getPath)
-    val pw = new PrintWriter("data.csv")
-
-    //def write_csv(): Unit = {
-
-      //val pw = new PrintWriter("data.csv")
-
+    //val f = new File(getClass.getClassLoader.getResource("data.csv").getPath)
+    val pw = new PrintWriter("../resources/data.csv")
+    
       for (i <- 1 until all_customer_IDs.length) {
-        pw.print(i+",")
+        pw.print(s"${i},")
         pw.print(s"${all_customer_IDs(i)},") //customer ID
         pw.print(s"${all_customer_names(i)},") //customer names
         pw.print(s"${all_product_IDs(i)},")           //product ID
@@ -305,7 +301,6 @@ object Generator {
       }
 
       pw.close() //always close to prevent seg fault
-   // }
   }
 }
 
