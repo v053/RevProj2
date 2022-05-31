@@ -1,7 +1,7 @@
 
 import vegas._
 import vegas.sparkExt._
-import vegas.DSL.ExtendedUnitSpecBuilder
+import vegas.DSL.{ExtendedUnitSpecBuilder, UnitSpecBuilder}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import java.io.PrintWriter
@@ -144,7 +144,7 @@ object DataVisualizer {
     }
   }
 
-  /*def plotMultiLineChart(df_array: Array[DataFrame], chart_title: String = ""): Unit = {
+  def plotMultiLineChart(df_array: Array[DataFrame], chart_title: String = ""): Unit = {
     val colors = Array("0653BE","BE06AF", "#BE7106", "06BE15", "36CCF0")
     val all_layers: ArrayBuffer[UnitSpecBuilder] = ArrayBuffer()
     for(df <- df_array) {
@@ -173,7 +173,7 @@ object DataVisualizer {
       .mark(mark_type)
 
     my_layer
-  }*/
+  }
 
 
   def showAndWriteToHTML(): Unit = {
