@@ -245,10 +245,10 @@ object Generator {
         all_payment_types(rn) = null
 
       } else if (rn2 == 6) {
-        all_qtys(rn) = null
+        //all_qtys(rn) = null
 
       } else if (rn2 == 7) {
-        all_prices(rn) = null
+        //all_prices(rn) = null
 
       } else if (rn2 == 8) {
         all_datetimes(rn) = null
