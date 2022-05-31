@@ -1,5 +1,4 @@
 
-import Generator.getClass
 import vegas._
 import vegas.sparkExt._
 import vegas.DSL.{ExtendedUnitSpecBuilder, UnitSpecBuilder}
@@ -19,18 +18,12 @@ object DataVisualizer {
     .getOrCreate()
 
   var all_plots: ArrayBuffer[ExtendedUnitSpecBuilder] = ArrayBuffer()
+  var all_layered_plots: ArrayBuffer[vegas.DSL.LayerSpecBuilder] = ArrayBuffer()
 
   /*val df = spark.read.csv("data.csv")
   df.createOrReplaceTempView("Orders")
   df.registerTempTable("Orders")*/
 
- // val dfQ2_1_21_J = spark.sql (
- //   "SELECT _c9, _c7, _c4 FROM Orders where _c9 like '2021-01%'").toDF("Time","Products Sold","Product Name")
- // dfQ2_1_21_J.show()
-  val dfQ1_1 = spark.sql("SELECT _c5, sum(_c7) FROM Orders group by _c5").toDF("Category","Products Sold")
-  //dfQ1_1.show()
-  val dfQ1_2 = spark.sql("SELECT _c11, _c5, sum(_c7) FROM Orders group by _c11, _c5").toDF("Country","Category","Products Sold")
-  //dfQ1_2.show()
 
   // Sample Data
   val sample_data1: Seq[(String, Int)] = Seq(("stationery", 10), ("household products", 3), ("groceries", 5))
@@ -54,6 +47,14 @@ object DataVisualizer {
       "website","txn_id","txn_success","failure_reason")
 
   df.createOrReplaceTempView("orders")
+
+  // val dfQ2_1_21_J = spark.sql (
+  //   "SELECT datetime, qty, product_name FROM Orders where datetime like '2021-01%'").toDF("Time","Products Sold","Product Name")
+  // dfQ2_1_21_J.show()
+  val dfQ1_1 = spark.sql("SELECT product_category, sum(qty) FROM orders group by product_category").toDF("Category","Products Sold")
+  //dfQ1_1.show()
+  val dfQ1_2 = spark.sql("SELECT country, product_category, sum(qty) FROM Orders group by country, product_category").toDF("Country","Category","Products Sold")
+  //dfQ1_2.show()
 
   def main(args: Array[String]): Unit = {
     queryTopSellingProduct()
@@ -168,7 +169,8 @@ object DataVisualizer {
         layers_array: _*
       )
 
-    all_plots += plot
+    //plot.show
+    all_layered_plots += plot
   }
 
   def createGraphLayer(df: DataFrame, mark_type: spec.Spec.Mark): UnitSpecBuilder = {
@@ -213,6 +215,7 @@ object DataVisualizer {
     val Computer_caseA: DataFrame = spark.createDataFrame(Years("Computer case")).toDF("Year", "Access")
     val Dinner_platesA: DataFrame = spark.createDataFrame(Years("Dinner plates")).toDF("Year", "Access")
     plotMultiLineChart(Array(CBA,MopA,WCA,Computer_caseA,Dinner_platesA))
+
   }
 
   def Drop(): Unit = {
@@ -232,40 +235,40 @@ object DataVisualizer {
 
   def Months2021(Product: String): Seq[(String, Double)] = {
     val dfQ2_1_21_J = spark.sql (
-      "CREATE TEMPORARY VIEW 2021J AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-01%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021J AS SELECT datetime, qty FROM Orders where datetime like '2021-01%' AND product_name = '"+Product+"'")
     val  J2021 = Averages("2021J")
     val dfQ2_1_21_F = spark.sql (
-      "CREATE TEMPORARY VIEW 2021F AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-02%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021F AS SELECT datetime, qty FROM Orders where datetime like '2021-02%' AND product_name = '"+Product+"'")
     val  F2021 = Averages("2021F")
     val dfQ2_1_21_M = spark.sql (
-      "CREATE TEMPORARY VIEW 2021M AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-03%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021M AS SELECT datetime, qty FROM Orders where datetime like '2021-03%' AND product_name = '"+Product+"'")
     val  M2021 = Averages("2021M")
     val dfQ2_1_21_A = spark.sql (
-      "CREATE TEMPORARY VIEW 2021A AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-04%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021A AS SELECT datetime, qty FROM Orders where datetime like '2021-04%' AND product_name = '"+Product+"'")
     val  A2021 = Averages("2021A")
     val dfQ2_1_21_Ma = spark.sql (
-      "CREATE TEMPORARY VIEW 2021Ma AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-05%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021Ma AS SELECT datetime, qty FROM Orders where datetime like '2021-05%' AND product_name = '"+Product+"'")
     val  Ma2021 = Averages("2021Ma")
     val dfQ2_1_21_Ju = spark.sql (
-      "CREATE TEMPORARY VIEW 2021Ju AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-06%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021Ju AS SELECT datetime, qty FROM Orders where datetime like '2021-06%' AND product_name = '"+Product+"'")
     val  Ju2021 = Averages("2021Ju")
     val dfQ2_1_21_Jy = spark.sql (
-      "CREATE TEMPORARY VIEW 2021Jy AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-07%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021Jy AS SELECT datetime, qty FROM Orders where datetime like '2021-07%' AND product_name = '"+Product+"'")
     val  Jy2021 = Averages("2021Jy")
     val dfQ2_1_21_Au = spark.sql (
-      "CREATE TEMPORARY VIEW 2021Au AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-08%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021Au AS SELECT datetime, qty FROM Orders where datetime like '2021-08%' AND product_name = '"+Product+"'")
     val  Au2021 = Averages("2021Au")
     val dfQ2_1_21_S = spark.sql (
-      "CREATE TEMPORARY VIEW 2021Se AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-09%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021Se AS SELECT datetime, qty FROM Orders where datetime like '2021-09%' AND product_name = '"+Product+"'")
     val  S2021 = Averages("2021Se")
     val dfQ2_1_21_O = spark.sql (
-      "CREATE TEMPORARY VIEW 2021O AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-10%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021O AS SELECT datetime, qty FROM Orders where datetime like '2021-10%' AND product_name = '"+Product+"'")
     val  O2021 = Averages("2021O")
     val dfQ2_1_21_N = spark.sql (
-      "CREATE TEMPORARY VIEW 2021N AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-11%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021N AS SELECT datetime, qty FROM Orders where datetime like '2021-11%' AND product_name = '"+Product+"'")
     val N2021 = Averages("2021N")
     val dfQ2_1_21_D = spark.sql (
-      "CREATE TEMPORARY VIEW 2021De AS SELECT _c9, _c7 FROM Orders where _c9 like '2021-12%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021De AS SELECT datetime, qty FROM Orders where datetime like '2021-12%' AND product_name = '"+Product+"'")
     val D2021 = Averages("2021De")
     val Average2021: Seq[(String, Double)] = Seq(("2021-01",J2021),("2021-02",F2021),
       ("2021-03",M2021),("2021-04",A2021),("2021-05",Ma2021),("2021-06",Ju2021),("2021-07",Jy2021),
@@ -277,40 +280,40 @@ object DataVisualizer {
 
   def Years(Product: String): Seq[(String, Double)] = {
     val dfQ2_1_21_J = spark.sql (
-      "CREATE TEMPORARY VIEW 2021J AS SELECT _c9, _c7 FROM Orders where _c9 like '2022%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021J AS SELECT datetime, qty FROM Orders where datetime like '2022%' AND product_name = '"+Product+"'")
     val  J2021 = Averages("2021J")
     val dfQ2_1_21_F = spark.sql (
-      "CREATE TEMPORARY VIEW 2021F AS SELECT _c9, _c7 FROM Orders where _c9 like '2021%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021F AS SELECT datetime, qty FROM Orders where datetime like '2021%' AND product_name = '"+Product+"'")
     val  F2021 = Averages("2021F")
     val dfQ2_1_21_M = spark.sql (
-      "CREATE TEMPORARY VIEW 2021M AS SELECT _c9, _c7 FROM Orders where _c9 like '2019%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021M AS SELECT datetime, qty FROM Orders where datetime like '2019%' AND product_name = '"+Product+"'")
     val  M2021 = Averages("2021M")
     val dfQ2_1_21_A = spark.sql (
-      "CREATE TEMPORARY VIEW 2021A AS SELECT _c9, _c7 FROM Orders where _c9 like '2018%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021A AS SELECT datetime, qty FROM Orders where datetime like '2018%' AND product_name = '"+Product+"'")
     val  A2021 = Averages("2021A")
     val dfQ2_1_21_Ma = spark.sql (
-      "CREATE TEMPORARY VIEW 2021Ma AS SELECT _c9, _c7 FROM Orders where _c9 like '2017%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021Ma AS SELECT datetime, qty FROM Orders where datetime like '2017%' AND product_name = '"+Product+"'")
     val  Ma2021 = Averages("2021Ma")
     val dfQ2_1_21_Ju = spark.sql (
-      "CREATE TEMPORARY VIEW 2021Ju AS SELECT _c9, _c7 FROM Orders where _c9 like '2016%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021Ju AS SELECT datetime, qty FROM Orders where datetime like '2016%' AND product_name = '"+Product+"'")
     val  Ju2021 = Averages("2021Ju")
     val dfQ2_1_21_Jy = spark.sql (
-      "CREATE TEMPORARY VIEW 2021Jy AS SELECT _c9, _c7 FROM Orders where _c9 like '2015%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021Jy AS SELECT datetime, qty FROM Orders where datetime like '2015%' AND product_name = '"+Product+"'")
     val  Jy2021 = Averages("2021Jy")
     val dfQ2_1_21_Au = spark.sql (
-      "CREATE TEMPORARY VIEW 2021Au AS SELECT _c9, _c7 FROM Orders where _c9 like '2014%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021Au AS SELECT datetime, qty FROM Orders where datetime like '2014%' AND product_name = '"+Product+"'")
     val  Au2021 = Averages("2021Au")
     val dfQ2_1_21_S = spark.sql (
-      "CREATE TEMPORARY VIEW 2021Se AS SELECT _c9, _c7 FROM Orders where _c9 like '2013%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021Se AS SELECT datetime, qty FROM Orders where datetime like '2013%' AND product_name = '"+Product+"'")
     val  S2021 = Averages("2021Se")
     val dfQ2_1_21_O = spark.sql (
-      "CREATE TEMPORARY VIEW 2021O AS SELECT _c9, _c7 FROM Orders where _c9 like '2012%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021O AS SELECT datetime, qty FROM Orders where datetime like '2012%' AND product_name = '"+Product+"'")
     val  O2021 = Averages("2021O")
     val dfQ2_1_21_N = spark.sql (
-      "CREATE TEMPORARY VIEW 2021N AS SELECT _c9, _c7 FROM Orders where _c9 like '2011%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021N AS SELECT datetime, qty FROM Orders where datetime like '2011%' AND product_name = '"+Product+"'")
     val N2021 = Averages("2021N")
     val dfQ2_1_21_D = spark.sql (
-      "CREATE TEMPORARY VIEW 2021De AS SELECT _c9, _c7 FROM Orders where _c9 like '2010%' AND _c4 = '"+Product+"'")
+      "CREATE TEMPORARY VIEW 2021De AS SELECT datetime, qty FROM Orders where datetime like '2010%' AND product_name = '"+Product+"'")
     val D2021 = Averages("2021De")
     val Average2021: Seq[(String, Double)] = Seq(("2022",J2021),("2021",F2021),
       ("2019",M2021),("2018",A2021),("2017",Ma2021),("2016",Ju2021),("2015",Jy2021),
@@ -322,7 +325,7 @@ object DataVisualizer {
 
   def Averages(df: String): Double ={
     var D = 0.0
-    val dfQ2_1_1 = spark.sql ("Select AVG(_C7) from "+df).toDF(df)
+    val dfQ2_1_1 = spark.sql ("Select AVG(qty) from "+df).toDF(df)
     D = GrabValue(dfQ2_1_1, df)
     D
   }
@@ -340,16 +343,25 @@ object DataVisualizer {
 
   def showAndWriteToHTML(): Unit = {
     val pw = new PrintWriter("plots.html")
-    if(all_plots.nonEmpty) {
+    if(all_plots.nonEmpty || all_layered_plots.nonEmpty) {
       pw.println(all_plots(0).html.headerHTML())
-      for (i <- all_plots.indices) {
-        all_plots(i).show
-        pw.println(all_plots(i).html.plotHTML())
+      if (all_plots.nonEmpty) {
+        for (i <- all_plots.indices) {
+          all_plots(i).show
+          pw.println(all_plots(i).html.plotHTML())
+        }
+      }
+      if (all_layered_plots.nonEmpty) {
+        for (i <- all_layered_plots.indices) {
+          all_layered_plots(i).show
+          pw.println(all_layered_plots(i).html.plotHTML())
+        }
       }
       pw.println(all_plots(0).html.footerHTML)
     } else {
-      pw.println("No charts to write.")
+      pw.println("No plots to write.")
     }
+
     pw.close()
   }
 }
