@@ -1,4 +1,5 @@
 import scala.util.control.Breaks._
+import DataVisualizer._
 
 //TODO: local imports for what's needed 
 //For data visualization, 
@@ -24,7 +25,7 @@ object Main {
       //  //TODO?: call to generate.scala
 
       }else if(cmd == "-v") {   //visualization tools
-        //TODO: call data visualization 
+        //TODO: call data visualization
         cmd = menu_main();
 
       }else if(cmd == "-q1") {

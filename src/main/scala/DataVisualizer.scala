@@ -9,13 +9,21 @@ import java.io.{File, PrintWriter}
 import scala.collection.mutable.ArrayBuffer
 
 
+
 object DataVisualizer {
+
+  //val warehouseLocation: String = new File("spark-warehouse").getAbsolutePath
+
   val spark: SparkSession = SparkSession
     .builder()
     .appName("Spark-Vegas Data Visualizer")
     .config("spark.master", "local")
+    //.config("spark.sql.dir.warehouse")
     .enableHiveSupport()
     .getOrCreate()
+
+  import spark.implicits._
+  import spark.sql
 
   var all_plots: ArrayBuffer[ExtendedUnitSpecBuilder] = ArrayBuffer()
   var all_layered_plots: ArrayBuffer[vegas.DSL.LayerSpecBuilder] = ArrayBuffer()
@@ -47,6 +55,10 @@ object DataVisualizer {
       "website","txn_id","txn_success","failure_reason")
 
   df.createOrReplaceTempView("orders")
+  //sql("CREATE DATABASE IF NOT EXISTS project_2_db")
+  //sql("USE project_2_db")
+  //df.write.mode("overwrite").saveAsTable("orders_hive")
+
 
   // val dfQ2_1_21_J = spark.sql (
   //   "SELECT datetime, qty, product_name FROM Orders where datetime like '2021-01%'").toDF("Time","Products Sold","Product Name")
@@ -60,9 +72,9 @@ object DataVisualizer {
     queryTopSellingProduct()
     queryTopSellingProductByCountry()
     Question2()
+    //sql("SELECT * FROM orders_hive").show()
 
-
-    showAndWriteToHTML()
+    //showAndWriteToHTML()
   }
 
   // Queries
@@ -114,6 +126,8 @@ object DataVisualizer {
       //val raw_html = plot.html.plotHTML(chart_title)
       all_plots += plot
 
+      plot.show
+
     } else {
       val plot = Vegas(chart_title)
         .withDataFrame(df)
@@ -124,6 +138,8 @@ object DataVisualizer {
 
       //val raw_html = plot.html.plotHTML(chart_title)
       all_plots += plot
+
+      plot.show
     }
   }
 
@@ -142,6 +158,8 @@ object DataVisualizer {
 
       //val raw_html = plot.html.plotHTML(chart_title)
       all_plots += plot
+      plot.show
+
     } else {
       val plot = Vegas(chart_title)
         .withDataFrame(df)
@@ -151,10 +169,12 @@ object DataVisualizer {
 
       //val raw_html = plot.html.plotHTML(chart_title)
       all_plots += plot
+
+      plot.show
     }
   }
 
-  def plotMultiLineChart(df_array: Array[DataFrame], chart_title: String = ""): Unit = {
+  def plotMultiLineChart(df_array: Array[DataFrame], chart_title: String = ""):Unit  = {
     val colors = Array("0653BE","BE06AF", "#BE7106", "06BE15", "36CCF0")
     val all_layers: ArrayBuffer[UnitSpecBuilder] = ArrayBuffer()
     for(df <- df_array) {
@@ -169,8 +189,9 @@ object DataVisualizer {
         layers_array: _*
       )
 
-    //plot.show
+    plot.show
     all_layered_plots += plot
+
   }
 
   def createGraphLayer(df: DataFrame, mark_type: spec.Spec.Mark): UnitSpecBuilder = {
@@ -341,7 +362,7 @@ object DataVisualizer {
     D
   }
 
-  def showAndWriteToHTML(): Unit = {
+  def showAndWriteAllToHTML(): Unit = {
     val pw = new PrintWriter("plots.html")
     if(all_plots.nonEmpty || all_layered_plots.nonEmpty) {
       pw.println(all_plots(0).html.headerHTML())
@@ -363,5 +384,11 @@ object DataVisualizer {
     }
 
     pw.close()
+  }
+
+  def showAndWriteOneToHTML(plot: ExtendedUnitSpecBuilder, filename: String): Unit = {
+    val pw = new PrintWriter(s"$filename.html")
+    plot.show
+    pw.println(plot.html.pageHTML(filename))
   }
 }
