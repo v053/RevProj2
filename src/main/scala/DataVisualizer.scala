@@ -9,7 +9,6 @@ import java.io.{File, PrintWriter}
 import scala.collection.mutable.ArrayBuffer
 
 
-
 object DataVisualizer {
 
   //val warehouseLocation: String = new File("spark-warehouse").getAbsolutePath
@@ -72,9 +71,10 @@ object DataVisualizer {
     queryTopSellingProduct()
     queryTopSellingProductByCountry()
     Question2()
+    queryHighestTrafficOfSales()
     //sql("SELECT * FROM orders_hive").show()
 
-    //showAndWriteToHTML()
+    //showAndWriteAllToHTML()
   }
 
   // Queries
@@ -87,6 +87,11 @@ object DataVisualizer {
     val query_selection_df: DataFrame = spark.sql("SELECT country, SUM(qty) AS quantity, product_category FROM orders WHERE product_category != 'null' AND country != 'null' GROUP BY country, product_category")
     plotBarChart(query_selection_df,has_categories = true,"product_category","Top Product Category by Country")
   }
+
+   def queryHighestTrafficOfSales():  Unit = {
+      val query_selection_df: DataFrame = spark.sql("SELECT city, SUM(qty) AS quantity, product_category FROM orders WHERE product_category != 'null' AND city != 'null' GROUP BY city, product_category")
+      plotBarChart(query_selection_df,has_categories = true,"Products Sold","Highest traffic of Sales")
+    }
 
 
   // Plotting
@@ -191,7 +196,6 @@ object DataVisualizer {
 
     plot.show
     all_layered_plots += plot
-
   }
 
   def createGraphLayer(df: DataFrame, mark_type: spec.Spec.Mark): UnitSpecBuilder = {
