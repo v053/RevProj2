@@ -4,12 +4,18 @@ import vegas.sparkExt._
 import vegas.DSL.{ExtendedUnitSpecBuilder, UnitSpecBuilder}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
 
 import java.io.{File, PrintWriter}
 import scala.collection.mutable.ArrayBuffer
 
 
 object DataVisualizer {
+
+  Logger.getLogger("org").setLevel(Level.ERROR)
+  Logger.getLogger("akka").setLevel(Level.ERROR)
 
   //val warehouseLocation: String = new File("spark-warehouse").getAbsolutePath
 
@@ -20,6 +26,8 @@ object DataVisualizer {
     //.config("spark.sql.dir.warehouse")
     .enableHiveSupport()
     .getOrCreate()
+
+  spark.sparkContext.setLogLevel("ERROR")
 
   import spark.implicits._
   import spark.sql
@@ -359,7 +367,7 @@ object DataVisualizer {
     var D = 0.0
     val listValues = df.select(name).collect.toList
     if (listValues(0).anyNull) {
-      println("No sales this Month")
+      //println("No sales this Month")
     } else {
       D = listValues(0).getDouble(0)
     }

@@ -1,11 +1,12 @@
 import scala.util.control.Breaks._
-import DataVisualizer._
 import DataVisualizer.{df, spark}
 import org.apache.spark.sql.SparkSession
 
 import java.io.{File, FileWriter}
 import scala.io.Source
 import scala.util.control.Breaks.{getClass, _}
+
+import sys.exit
 
 //TODO: local imports for what's needed
 //For data visualization,
@@ -14,7 +15,8 @@ import scala.util.control.Breaks.{getClass, _}
 
 
 object Main {
-  val f = new File(getClass.getClassLoader.getResource("Login.txt").getPath)
+  //val f = new File(getClass.getClassLoader.getResource("Login.txt").getPath)
+  val f = "C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\Login.txt"
   val lines = Source.fromFile(f).getLines.toArray
   val users = scala.collection.mutable.Map[String, String]()
   for (n <- 0 until lines.length) {
@@ -46,14 +48,18 @@ object Main {
 
         }else if(cmd == "-q1") {
           //TODO: calls to query 1 functionality here
+          DataVisualizer.queryTopSellingProduct()
+          DataVisualizer.queryTopSellingProductByCountry()
           cmd = menu_main();
 
         }else if(cmd == "-q2") {
           //TODO: calls to query 2 functionality here
+          DataVisualizer.Question2()
           cmd = menu_main();
 
         }else if(cmd == "-q3") {
           //TODO: calls to query 3 functionality here
+          DataVisualizer.queryHighestTrafficOfSales()
           cmd = menu_main();
 
         }else if(cmd == "-q4") {
@@ -66,6 +72,7 @@ object Main {
 
         }else if(cmd == "-e") {   //exit
           exit = true;
+          sys.exit()
           break();
         }
 
@@ -85,10 +92,10 @@ object Main {
     //println("-g");
     println("-v (run data visualization tools)");
     println(" ");
-    println("-q1 ()");
-    println("-q2 ()");
-    println("-q3 ()");
-    println("-q4 ()");
+    println("-q1 (Top selling product categories)");
+    println("-q2 (Popularity of products throughout year)");
+    println("-q3 (Locations with highest traffic of sales)");
+    println("-q4 (Times with highest traffic of sales)");
     println(" ");
     println("-h (help for more options)");
     println("-e (exit)");
