@@ -60,6 +60,7 @@ object DataVisualizer {
     queryTopSellingProduct()
     queryTopSellingProductByCountry()
     Question2()
+    queryHighestTrafficOfSales()
 
 
     showAndWriteToHTML()
@@ -75,6 +76,11 @@ object DataVisualizer {
     val query_selection_df: DataFrame = spark.sql("SELECT country, SUM(qty) AS quantity, product_category FROM orders WHERE product_category != 'null' AND country != 'null' GROUP BY country, product_category")
     plotBarChart(query_selection_df,has_categories = true,"product_category","Top Product Category by Country")
   }
+  
+   def queryHighestTrafficOfSales():  Unit = {
+      val query_selection_df: DataFrame = spark.sql("SELECT city, SUM(qty) AS quantity, product_category FROM orders WHERE product_category != 'null' AND city != 'null' GROUP BY city, product_category")
+      plotBarChart(query_selection_df,has_categories = true,"Products Sold","Highest traffic of Sales")
+    }
 
 
   // Plotting
