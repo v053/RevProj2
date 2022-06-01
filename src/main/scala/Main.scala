@@ -15,8 +15,8 @@ import sys.exit
 
 
 object Main {
-  //val f = new File(getClass.getClassLoader.getResource("Login.txt").getPath)
-  val f = "C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\Login.txt"
+  val f = new File(getClass.getClassLoader.getResource("Login.txt").getPath)
+  //val f = "C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\Login.txt"
   val lines = Source.fromFile(f).getLines.toArray
   val users = scala.collection.mutable.Map[String, String]()
   for (n <- 0 until lines.length) {
@@ -29,9 +29,9 @@ object Main {
     var exit : Boolean = false;   //exit program flag
     var cmd : String = " ";       //active input read
 
-    //cmd = menu_main();            //inital menu print / choose option
+    cmd = menu_main();            //inital menu print / choose option
 
-    cmd = Login(users)
+    //cmd = Login(users)
 
     breakable{
       while(exit == false) {
