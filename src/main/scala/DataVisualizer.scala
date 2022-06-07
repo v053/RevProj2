@@ -29,33 +29,16 @@ object DataVisualizer {
 
   spark.sparkContext.setLogLevel("ERROR")
 
-  import spark.implicits._
-  import spark.sql
-
   var all_plots: ArrayBuffer[ExtendedUnitSpecBuilder] = ArrayBuffer()
   var all_layered_plots: ArrayBuffer[vegas.DSL.LayerSpecBuilder] = ArrayBuffer()
-
-  /*val df = spark.read.csv("data.csv")
-  df.createOrReplaceTempView("Orders")
-  df.registerTempTable("Orders")*/
-
-
-  // Sample Data
-  val sample_data1: Seq[(String, Int)] = Seq(("stationery", 10), ("household products", 3), ("groceries", 5))
-  val sample_data2: Seq[(String, Int)] = Seq(("00:00",50), ("01:00", 120), ("02:00",150), ("03:00",400))
-  val sample_data3: Seq[(String, Int)] = Seq(("00:00",20), ("01:00", 100), ("02:00",350), ("03:00",470))
-  val sample_data4: Seq[(String, Int)] = Seq(("00:00",30), ("01:00", 110), ("02:00",250), ("03:00",450))
-  val sample_df1: DataFrame = spark.createDataFrame(sample_data1).toDF("Category Name", "Products Sold")
-  val sample_df2: DataFrame = spark.createDataFrame(sample_data2).toDF("Time", "Access")
-  val sample_df3: DataFrame = spark.createDataFrame(sample_data3).toDF("Time", "Access")
 
 
   //val df = spark.read.csv("data.csv")
   val df: DataFrame = spark.read.format("csv")
     .option("header","false")
     .option("inferSchema", "true")
-    .load("C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\data.csv")
-    //.load("data.csv")
+    //.load("C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\data.csv")
+    .load("data.csv")
     .toDF("order_id","customer_id","customer_name",
       "product_id","product_name", "product_category","payment_type","qty","product_price",
       "datetime","country","city",
@@ -76,10 +59,11 @@ object DataVisualizer {
   //dfQ1_2.show()
 
   def main(args: Array[String]): Unit = {
-    queryTopSellingProduct()
+    Q4()
+    //queryTopSellingProduct()
     queryTopSellingProductByCountry()
-    Question2()
-    queryHighestTrafficOfSales()
+    //Question2()
+    //queryHighestTrafficOfSales()
     //sql("SELECT * FROM orders_hive").show()
 
     //showAndWriteAllToHTML()
@@ -87,19 +71,29 @@ object DataVisualizer {
 
   // Queries
   def queryTopSellingProduct(): Unit = {
-    val query_selection_df: DataFrame = spark.sql("SELECT product_category, SUM(qty) AS quantity FROM orders WHERE product_category != 'null' AND country != 'null' GROUP BY product_category")
+    val query_selection_df: DataFrame = spark.sql("SELECT product_category, SUM(qty) AS quantity FROM orders WHERE product_category != 'null' AND country != 'null' and country !='uwait' GROUP BY product_category")
     plotBarChart(query_selection_df, chart_title = "Top Selling Product Categories")
   }
 
   def queryTopSellingProductByCountry(): Unit = {
-    val query_selection_df: DataFrame = spark.sql("SELECT country, SUM(qty) AS quantity, product_category FROM orders WHERE product_category != 'null' AND country != 'null' GROUP BY country, product_category")
+    val query_selection_df: DataFrame = spark.sql("SELECT country, SUM(qty) AS quantity, product_category FROM orders WHERE product_category != 'null' AND country != 'null' and country !='uwait' GROUP BY country, product_category")
     plotBarChart(query_selection_df,has_categories = true,"product_category","Top Product Category by Country")
   }
 
-   def queryHighestTrafficOfSales():  Unit = {
-      val query_selection_df: DataFrame = spark.sql("SELECT city, SUM(qty) AS quantity, product_category FROM orders WHERE product_category != 'null' AND city != 'null' GROUP BY city, product_category")
-      plotBarChart(query_selection_df,has_categories = true,"Products Sold","Highest traffic of Sales")
-    }
+  def queryHighestTrafficOfSales():  Unit = {
+    val query_selection_df: DataFrame = spark.sql("SELECT city, SUM(qty) AS quantity, product_category FROM orders WHERE product_category != 'null' AND city != 'null' and country !='uwait' GROUP BY city, product_category")
+    plotBarChart(query_selection_df,has_categories = true,"Products Sold","Highest traffic of Sales")
+  }
+
+  def Q4(): Unit = {
+    val dfQ4_1: DataFrame = spark.sql("Select datetime, qty from orders where datetime like '2021%' order by datetime")
+    dfQ4_1.show()
+    plotLineChart(dfQ4_1)
+
+    val dfQ4_2: DataFrame = spark.sql("Select datetime, qty, country from orders where datetime like '2021%' and country != 'null' and country !='uwait' order by datetime")
+    dfQ4_2.show()
+    plotLineChart(dfQ4_2,has_categories = true,"country")
+  }
 
 
   // Plotting
@@ -133,7 +127,7 @@ object DataVisualizer {
         .encodeColumn(col_name_array(0), Nominal, scale=Scale(padding=4.0), axis=Axis(orient=Orient.Bottom, axisWidth=1.0, offset= -8.0))
         .encodeY(col_name_array(1), data_type_array(1))
         .encodeX(category_filter, Nominal, hideAxis=true)
-        .encodeColor(category_filter, Nominal)
+        .encodeColor(category_filter, Nominal,legend=Legend(orient = "left", title=category_filter ))
         .mark(Bar)
 
       //val raw_html = plot.html.plotHTML(chart_title)
@@ -167,7 +161,8 @@ object DataVisualizer {
         .encodeY(col_name_array(1), data_type_array(1))
         .mark(Line)
         .encodeDetailFields(Field(field=category_filter, dataType=Nominal))
-        .encodeColor(category_filter, Nominal)
+        .encodeColor(category_filter, Nominal,legend=Legend(orient = "left", title="Place of Origin" )
+        )
 
       //val raw_html = plot.html.plotHTML(chart_title)
       all_plots += plot
@@ -221,12 +216,12 @@ object DataVisualizer {
 
   def Question2(): Unit = {
     //Views for 2021 Averages
-    var CB: DataFrame = spark.createDataFrame(Months2021("Cutting board")).toDF("Month", "Product_Sold")
+    val CB: DataFrame = spark.createDataFrame(Months2021("Cutting board")).toDF("Month", "Product_Sold")
     val Mop: DataFrame = spark.createDataFrame(Months2021("Mop")).toDF("Month", "Access")
     val WC: DataFrame = spark.createDataFrame(Months2021("Window cleaner")).toDF("Month", "Access")
     val Computer_case: DataFrame = spark.createDataFrame(Months2021("Computer case")).toDF("Month", "Access")
     val Dinner_plates: DataFrame = spark.createDataFrame(Months2021("Dinner plates")).toDF("Month", "Access")
-    val Keyboard: DataFrame = spark.createDataFrame(Months2021("Keyboard")).toDF("Time", "Access")
+    /*val Keyboard: DataFrame = spark.createDataFrame(Months2021("Keyboard")).toDF("Time", "Access")
     val Screws: DataFrame = spark.createDataFrame(Months2021("Screws")).toDF("Time", "Access")
     val Speaker: DataFrame = spark.createDataFrame(Months2021("Speaker")).toDF("Time", "Access")
     val Ladder: DataFrame = spark.createDataFrame(Months2021("Ladder")).toDF("Time", "Access")
@@ -239,10 +234,12 @@ object DataVisualizer {
     val Box_cutter: DataFrame = spark.createDataFrame(Months2021("Box cutter")).toDF("Time", "Access")
     val Ice_cube_trays: DataFrame = spark.createDataFrame(Months2021("Ice cube trays")).toDF("Time", "Access")
     val Printer: DataFrame = spark.createDataFrame(Months2021("Printer")).toDF("Time", "Access")
+
+     */
     plotMultiLineChart(Array(CB,Mop,WC,Computer_case,Dinner_plates))
 
     //Views for Overall Averages
-    var CBA: DataFrame = spark.createDataFrame(Years("Cutting board")).toDF("Year", "Product_Sold")
+    val CBA: DataFrame = spark.createDataFrame(Years("Cutting board")).toDF("Year", "Product_Sold")
     val MopA: DataFrame = spark.createDataFrame(Years("Mop")).toDF("Year", "Access")
     val WCA: DataFrame = spark.createDataFrame(Years("Window cleaner")).toDF("Year", "Access")
     val Computer_caseA: DataFrame = spark.createDataFrame(Years("Computer case")).toDF("Year", "Access")

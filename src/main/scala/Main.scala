@@ -2,10 +2,9 @@ import scala.util.control.Breaks._
 import DataVisualizer.{df, spark}
 import org.apache.spark.sql.SparkSession
 
-import java.io.{File, FileWriter}
+import java.io.{File, FileOutputStream, FileWriter, PrintWriter}
 import scala.io.Source
 import scala.util.control.Breaks.{getClass, _}
-
 import sys.exit
 
 //TODO: local imports for what's needed
@@ -15,9 +14,10 @@ import sys.exit
 
 
 object Main {
-  val f = new File(getClass.getClassLoader.getResource("Login.txt").getPath)
+  //val f = new File(getClass.getClassLoader.getResource("Login.txt").getPath)
+  val f = Source.fromFile("Login.txt")
   //val f = "C:\\Users\\Erienne Work\\Documents\\Revature\\Training Projects\\Project2\\src\\main\\resources\\Login.txt"
-  val lines = Source.fromFile(f).getLines.toArray
+  val lines = f.getLines.toArray
   val users = scala.collection.mutable.Map[String, String]()
   for (n <- 0 until lines.length) {
     val temp = lines(n).split(",")
@@ -25,17 +25,13 @@ object Main {
   }
   //-----------------------------------------------//
   def main(args:Array[String]): Unit = {
+    Login(users)
+  }
 
+  def selection(cmd: String): Unit = {
     var exit : Boolean = false;   //exit program flag
-    var cmd : String = " ";       //active input read
-
-    cmd = menu_main();            //inital menu print / choose option
-
-    //cmd = Login(users)
-
     breakable{
       while(exit == false) {
-
         if(exit == true) {
           break();
 
@@ -44,45 +40,45 @@ object Main {
 
         }else if(cmd == "-v") {   //visualization tools
           //TODO: call data visualization
-          cmd = menu_main();
+          menu_main();
 
         }else if(cmd == "-q1") {
           //TODO: calls to query 1 functionality here
           DataVisualizer.queryTopSellingProduct()
           DataVisualizer.queryTopSellingProductByCountry()
-          cmd = menu_main();
+          menu_main();
 
         }else if(cmd == "-q2") {
           //TODO: calls to query 2 functionality here
           DataVisualizer.Question2()
-          cmd = menu_main();
+          menu_main();
 
         }else if(cmd == "-q3") {
           //TODO: calls to query 3 functionality here
           DataVisualizer.queryHighestTrafficOfSales()
-          cmd = menu_main();
+          menu_main();
 
         }else if(cmd == "-q4") {
           //TODO: calls to query 4 functionality here
-          cmd = menu_main();
+          DataVisualizer.Q4()
+          menu_main();
 
         }else if(cmd == "-h") {   //help for more options
           menu_help();
-          cmd = menu_main();
+          menu_main();
 
         }else if(cmd == "-e") {   //exit
           exit = true;
           sys.exit()
           break();
         }
-
       }
-    }
 
+    }
   }
   //-----------------------------------------------//
 
-  def menu_main(): String = {
+  def menu_main(): Unit = {
     println("-------------------------------------------");
     println("                 Main Menu                 ");
     println("-------------------------------------------");
@@ -106,14 +102,13 @@ object Main {
 
     do {
       op = scala.io.StdIn.readLine( );
-
       if(!(op == "-v" || op == "-q1" || op == "-q2" || op == "-q3" || op == "-q4" || op == "-h" || op == "-e")) {
         println("Error! Please input a valid menu option.");
         println("Or, enter '-h' for more details.");
       }
     }while((op != "-v" && op != "-q1" && op != "-q2" && op != "-q3" && op != "-q4" && op != "-h" && op != "-e"));
 
-    return(op);
+    selection(op);
   }
 
   def menu_help(): Unit = {
@@ -132,18 +127,9 @@ object Main {
 
   }
 
-  def Login(users: scala.collection.mutable.Map[String, String]): String = {
+  def Login(users: scala.collection.mutable.Map[String, String]): Unit = {
     var cmd = "-e"
-  /*  val spark: SparkSession = SparkSession
-      .builder()
-      .appName("Spark-Vegas Data Visualizer")
-      .config("spark.master", "local")
-      .enableHiveSupport()
-      .getOrCreate()
-*/
 
- //   val df = spark.read.csv("src\\main\\resources\\login.csv").toDF("User","Password")
-  //  df.createOrReplaceTempView("Login")
     println("------------------------------------------")
     println("                  Login:                  ")
     println("------------------------------------------")
@@ -154,17 +140,15 @@ object Main {
     if(user == "signup"){
       Signup(users)
     }
-   // val UserSearch = spark.sql("SELECT * from Login where User = '"+user+"'")= '"+user+"'"
-    println("Password: ");
+    println("Password: ")
     var pass : String = " "
     pass = scala.io.StdIn.readLine()
-    //val PassSearch = spark.sql("SELECT * from Login where Password = '"+pass+"' and User = '"+user+"'")
     if(users.contains(user)) {
       val Passw = users.get(user)
       val Password = Passw.toString.substring(5, Passw.toString.length - 1)
       if (Password == pass) {
         println("Login Succesfull")
-        cmd = menu_main()
+        menu_main()
       } else {
         println("Password or username incorrect")
         Login(users)
@@ -173,8 +157,7 @@ object Main {
       println("Password or username incorrect")
       Login(users)
     }
-
-    cmd
+    selection(cmd)
   }
 
   def Signup(users: scala.collection.mutable.Map[String, String]): Unit ={
@@ -204,9 +187,11 @@ object Main {
       pass = scala.io.StdIn.readLine()
       if (temp == pass) {
         //val f = new File(getClass.getClassLoader.getResource("Login.txt").getPath)
-        val fw = new FileWriter(f, true)
+        val fw = new FileWriter("Login.txt", true)
+        //val pw = new PrintWriter(new File("Login.txt"))
         try {
           fw.write(user+","+pass)
+          fw.write("\n")
         }
         finally fw.close()
         users += (user -> pass)
